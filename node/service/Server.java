@@ -3,15 +3,14 @@ import java.net.*;
 import java.io.*;
 import java.security.*;
 import java.math.BigInteger;
+
 import org.java_websocket.*;
 import org.java_websocket.server.*;
 import org.java_websocket.handshake.*;
 import org.json.simple.*;
 import org.http_request.*;
-import model.*;
 
-public class Server extends WebSocketServer
-{
+public class Server extends WebSocketServer {
     private String viewserverAddr;
     private String myAddr;
     private String masterKey;
@@ -22,8 +21,7 @@ public class Server extends WebSocketServer
     private Map<String, Room> roomsMap;
 
     public Server(InetSocketAddress addr, String viewserverAddr,
-        String myAddr, String masterKey)
-    {
+                  String myAddr, String masterKey) {
         super(addr);
 
         this.viewserverAddr = viewserverAddr;
@@ -38,57 +36,47 @@ public class Server extends WebSocketServer
     }
 
     @Override
-    public void onOpen(WebSocket conn, ClientHandshake handshake)
-    {
+    public void onOpen(WebSocket conn, ClientHandshake handshake) {
         System.out.println("Connected: " + conn);
     }
 
     @Override
-    public synchronized void onClose(WebSocket conn, int code, String reason, boolean remote)
-    {
+    public synchronized void onClose(WebSocket conn, int code, String reason, boolean remote) {
         System.out.println("Disconnected: " + conn);
-        if (socketsMap.containsKey(conn.hashCode()))
-        {
+        if (socketsMap.containsKey(conn.hashCode())) {
             User user = socketsMap.get(conn.hashCode());
             user.room.removeUser(user);
         }
     }
 
     @Override
-    public void onMessage(WebSocket conn, String message)
-    {
+    public void onMessage(WebSocket conn, String message) {
         try {
-        onMessage_(conn, message);
+            onMessage_(conn, message);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public void onMessage_(WebSocket conn, String message)
-    {
+
+    public void onMessage_(WebSocket conn, String message) {
         String[] data = message.split("__");
         System.out.println(Arrays.toString(data));
         String command = data[0];
         User user;
 
-        synchronized (this) 
-        {
-            if (command.equals("QUERYSERVICE"))
-            {
+        synchronized (this) {
+            if (command.equals("QUERYSERVICE")) {
                 // request to get service info
                 if (data[1] == masterKey)
                     conn.send(serviceJSON().toString());
                 return;
-            }
-            else if (command.equals("QUERYROOM"))
-            {
+            } else if (command.equals("QUERYROOM")) {
                 // request to get room info
                 String roomname = data[1];
                 if (roomsMap.containsKey(roomname))
                     conn.send(roomsMap.get(roomname).statusJSON().toString());
                 return;
-            }
-            else if (command.equals("HELLO"))
-            {
+            } else if (command.equals("HELLO")) {
                 String roomname = data[1];
                 String username = data[2];
                 if (!encode(roomname, serviceKey, username).equals(data[3]))
@@ -103,9 +91,7 @@ public class Server extends WebSocketServer
                 socketsMap.put(conn.hashCode(), user);
                 user.room.addUser(user);
                 return;
-            }
-            else
-            {
+            } else {
                 if (!socketsMap.containsKey(conn.hashCode()))
                     return;
                 user = socketsMap.get(conn.hashCode());
@@ -119,8 +105,7 @@ public class Server extends WebSocketServer
             room.beginGame(user);
         else if (command.equals("NEWROUND"))
             room.newRound(user);
-        else
-        {
+        else {
             // the remaining commands all involve a play,
             //   which consists of a number of card IDs.
             Play play = room.parsePlay(user, data);
@@ -136,30 +121,24 @@ public class Server extends WebSocketServer
     }
 
     @Override
-    public void onError(WebSocket conn, Exception ex)
-    {
+    public void onError(WebSocket conn, Exception ex) {
         System.out.println("Error: " + ex);
     }
 
-    private void notifyViewserver()
-    {
-        try
-        {
+    private void notifyViewserver() {
+        try {
             String urlParameters =
-                "address=" + URLEncoder.encode(myAddr, "UTF-8") +
-                "&masterKey=" + URLEncoder.encode(masterKey, "UTF-8") +
-                "&serviceKey=" + URLEncoder.encode(serviceKey, "UTF-8");
+                    "address=" + URLEncoder.encode(myAddr, "UTF-8") +
+                            "&masterKey=" + URLEncoder.encode(masterKey, "UTF-8") +
+                            "&serviceKey=" + URLEncoder.encode(serviceKey, "UTF-8");
             HTTPRequest.executePost(
                     "http://" + viewserverAddr + "/service", urlParameters);
-        }
-        catch (UnsupportedEncodingException e)
-        {
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
-    private JSONObject serviceJSON()
-    {
+    private JSONObject serviceJSON() {
         JSONObject obj = new JSONObject();
         obj.put("key", serviceKey);
         JSONArray roomsJ = new JSONArray();
@@ -168,40 +147,34 @@ public class Server extends WebSocketServer
         return obj;
     }
 
-    private String encode(String ... data)
-    {
-        try
-        {
+    private String encode(String... data) {
+        try {
             MessageDigest md = MessageDigest.getInstance("md5");
             for (String s : data)
                 md.update(s.getBytes());
             byte[] encoded = md.digest();
             StringBuilder sb = new StringBuilder();
-            for (byte b : encoded)
-            {
+            for (byte b : encoded) {
                 String s = Integer.toString(b < 0 ? b + 256 : b, 16);
                 if (s.length() == 1)
                     sb.append('0');
                 sb.append(s);
             }
             return sb.toString();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
+        } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("MD5 algorithm not supported.");
         }
     }
 
-    public static void main(String ... args) throws Exception
-    {
+    public static void main(String... args) throws Exception {
         // arguments: [viewserverAddr] [address:port] [masterKey]
         String port = args[1].split(":")[1];
         Server s = new Server(
-            new InetSocketAddress(Integer.parseInt(port)),
-            args[0],
-            args[1],
-            args[2]
-            );
+                new InetSocketAddress(Integer.parseInt(port)),
+                args[0],
+                args[1],
+                args[2]
+        );
         s.start();
     }
 }

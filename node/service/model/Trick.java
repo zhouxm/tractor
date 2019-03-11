@@ -1,38 +1,32 @@
-package model;
+package cn.jj.ai.tractor.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Trick implements Serializable
-{
+public class Trick implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final List<Play> plays;
     private Play winningPlay;
 
-    public Trick()
-    {
+    public Trick() {
         plays = new ArrayList<Play>();
     }
 
-    public void addPlay(Play play)
-    {
+    public void addPlay(Play play) {
         plays.add(play);
     }
 
-    public void setWinningPlay(Play play)
-    {
+    public void setWinningPlay(Play play) {
         winningPlay = play;
     }
 
-    public List<Play> getPlays()
-    {
+    public List<Play> getPlays() {
         return new ArrayList<Play>(plays);
     }
 
-    public Play getPlayByID(int playerID)
-    {
+    public Play getPlayByID(int playerID) {
         for (Play play : plays)
             if (play.getPlayerID() == playerID)
                 return play;
@@ -40,26 +34,22 @@ public class Trick implements Serializable
         return null;
     }
 
-    public int numPlays()
-    {
+    public int numPlays() {
         return plays.size();
     }
 
-    public int numPoints()
-    {
+    public int numPoints() {
         int numPoints = 0;
         for (Play play : plays)
             numPoints += play.numPoints();
         return numPoints;
     }
 
-    public Play getInitialPlay()
-    {
+    public Play getInitialPlay() {
         return plays.get(0);
     }
 
-    public Play getWinningPlay()
-    {
+    public Play getWinningPlay() {
         return winningPlay;
     }
 }

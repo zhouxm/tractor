@@ -1,115 +1,93 @@
-package view;
+package cn.jj.ai.tractor.view;
 
-import model.Card;
-import model.FriendCards;
-import model.Game;
-import model.Play;
-import model.Trick;
+import cn.jj.ai.tractor.model.Card;
+import cn.jj.ai.tractor.model.FriendCards;
+import cn.jj.ai.tractor.model.Game;
+import cn.jj.ai.tractor.model.Play;
+import cn.jj.ai.tractor.model.Trick;
 
-public class NullView extends View
-{
-    public NullView(String name)
-    {
+public class NullView extends View {
+    public NullView(String name) {
         super(name);
     }
 
     @Override
-    public void start()
-    {
+    public void start() {
     }
 
     @Override
-    public void createRoom()
-    {
+    public void createRoom() {
     }
 
     @Override
-    public void closeRoom()
-    {
+    public void closeRoom() {
     }
 
     @Override
-    public void joinRoom()
-    {
+    public void joinRoom() {
     }
 
     @Override
-    public void leaveRoom()
-    {
+    public void leaveRoom() {
     }
 
     @Override
-    public void requestStartGame()
-    {
+    public void requestStartGame() {
     }
 
     @Override
-    public void startGame(Game game)
-    {
+    public void startGame(Game game) {
     }
 
     @Override
-    public void requestStartRound()
-    {
+    public void requestStartRound() {
     }
 
     @Override
-    public void startRound()
-    {
+    public void startRound() {
     }
 
     @Override
-    public void requestFriendCards(int numFriends)
-    {
+    public void requestFriendCards(int numFriends) {
     }
 
     @Override
-    public void notifyCanMakeKitty(int kittySize)
-    {
+    public void notifyCanMakeKitty(int kittySize) {
     }
 
     @Override
-    public void drawCard(Card card, int playerID)
-    {
+    public void drawCard(Card card, int playerID) {
     }
 
     @Override
-    public void showCards(Play play)
-    {
+    public void showCards(Play play) {
     }
 
     @Override
-    public void selectFriendCards(FriendCards friendCards)
-    {
+    public void selectFriendCards(FriendCards friendCards) {
     }
 
     @Override
-    public void makeKitty(Play play)
-    {
+    public void makeKitty(Play play) {
     }
 
     @Override
-    public void playCards(Play play)
-    {
+    public void playCards(Play play) {
     }
 
     @Override
-    public void finishTrick(Trick trick, int winnerID)
-    {
+    public void finishTrick(Trick trick, int winnerID) {
     }
 
     @Override
-    public void endRound()
-    {
+    public void endRound() {
     }
 
     @Override
-    public void notify(String notification)
-    {
+    public void notify(String notification) {
     }
 
     @Override
-    public void repaint()
-    {
+    public void repaint() {
     }
 }

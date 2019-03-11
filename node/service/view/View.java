@@ -1,34 +1,29 @@
-package view;
+package cn.jj.ai.tractor.view;
 
-import model.Card;
-import model.FriendCards;
-import model.Game;
-import model.Play;
-import model.Trick;
+import cn.jj.ai.tractor.model.Card;
+import cn.jj.ai.tractor.model.FriendCards;
+import cn.jj.ai.tractor.model.Game;
+import cn.jj.ai.tractor.model.Play;
+import cn.jj.ai.tractor.model.Trick;
 
-public abstract class View
-{
+public abstract class View {
     public final String name;
 
     private int myPlayerID;
 
-    public View(String name)
-    {
+    public View(String name) {
         this.name = name;
     }
 
-    public boolean joinedGame()
-    {
+    public boolean joinedGame() {
         return myPlayerID != 0;
     }
 
-    public int getPlayerID()
-    {
+    public int getPlayerID() {
         return myPlayerID;
     }
 
-    public void setPlayerID(int ID)
-    {
+    public void setPlayerID(int ID) {
         myPlayerID = ID;
     }
 

@@ -74,7 +74,7 @@ function setMainService(service, roomname, auth) {
     endMainService();
     gameSocket = new WebSocket('ws://' + service);
     if (gameSocket.readyState > 1) {  // CLOSED or CLOSING
-        alert('Upable to connect to room server.');
+        alert('Upable to connect to room cn.jj.ai.tractor.server.');
         return;
     }
 
