@@ -1,4 +1,4 @@
-package view;
+package ai.tractor.view;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -17,11 +17,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import model.GameProperties;
-import client.Client;
+import ai.tractor.model.GameProperties;
+import ai.tractor.client.Client;
 
-public class GamePropertiesForm extends JFrame
-{
+public class GamePropertiesForm extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private JComboBox<Integer> numDecksMenu;
@@ -30,14 +29,13 @@ public class GamePropertiesForm extends JFrame
     private JButton OKButton;
     private JButton cancelButton;
 
-    public GamePropertiesForm(JFrame parent, final Client client)
-    {
+    public GamePropertiesForm(JFrame parent, final Client client) {
         setTitle("Start new game.");
         setResizable(false);
 
         /* Set option for number of decks */
         Integer[] numDecksOptions =
-        { 1, 2, 3, 4 };
+                {1, 2, 3, 4};
         numDecksMenu = new JComboBox<Integer>(numDecksOptions);
         numDecksMenu.setSelectedIndex(1);
         numDecksMenu.setSize(100, 20);
@@ -46,31 +44,24 @@ public class GamePropertiesForm extends JFrame
         find_a_friendSelect = new JCheckBox();
 
         OKButton = new JButton("OK");
-        OKButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        OKButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 GameProperties properties = new GameProperties();
                 properties.numDecks = (Integer) numDecksMenu.getSelectedItem();
                 properties.find_a_friend = find_a_friendSelect.isSelected();
                 String isValid = isValid(properties, client.numPlayers());
-                if (isValid == null)
-                {
+                if (isValid == null) {
                     client.requestStartGame(properties);
                     dispose();
-                }
-                else
-                {
+                } else {
                     JOptionPane.showMessageDialog(GamePropertiesForm.this,
                             isValid);
                 }
             }
         });
         cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        cancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         });
@@ -85,8 +76,7 @@ public class GamePropertiesForm extends JFrame
                 position.y + (parentSize.height - size.height) / 2);
     }
 
-    private void arrange()
-    {
+    private void arrange() {
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         GroupLayout layout = new GroupLayout(panel);
@@ -136,17 +126,13 @@ public class GamePropertiesForm extends JFrame
         pack();
     }
 
-    private static String isValid(GameProperties properties, int numPlayers)
-    {
-        if (properties.find_a_friend)
-        {
+    private static String isValid(GameProperties properties, int numPlayers) {
+        if (properties.find_a_friend) {
             if (numPlayers < 4)
                 return "Need at least 4 players for 'find a friend'.";
             else
                 return null;
-        }
-        else
-        {
+        } else {
             if (numPlayers % 2 == 1)
                 return "Need even number of players.";
             else
