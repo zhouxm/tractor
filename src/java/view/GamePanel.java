@@ -32,8 +32,7 @@ import model.Play;
 import model.Player;
 import model.Trick;
 
-public class GamePanel extends JPanel
-{
+public class GamePanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private HumanView view;
@@ -43,32 +42,26 @@ public class GamePanel extends JPanel
     private Map<Card, CardPosition> cardPositions;
     private boolean showPreviousTrick;
 
-    public GamePanel(HumanView view)
-    {
+    public GamePanel(HumanView view) {
         setBackground(Color.GREEN);
         this.view = view;
     }
 
-    public void loadImages() throws IOException
-    {
+    public void loadImages() throws IOException {
         cardImages = new CardImages();
         cardImages.loadImages();
     }
 
-    public void setGame(Game game)
-    {
+    public void setGame(Game game) {
         this.game = game;
         this.cardPositions = new HashMap<Card, CardPosition>();
         for (MouseListener listener : getMouseListeners())
             removeMouseListener(listener);
         addMouseListener(new CardSelectListener());
         addMouseListener(new ShowPreviousTrickListener());
-        new Timer().schedule(new TimerTask()
-        {
-            public void run()
-            {
-                synchronized (cardPositions)
-                {
+        new Timer().schedule(new TimerTask() {
+            public void run() {
+                synchronized (cardPositions) {
                     for (CardPosition position : cardPositions.values())
                         position.snap();
                 }
@@ -77,11 +70,9 @@ public class GamePanel extends JPanel
         }, 50, 50);
     }
 
-    public List<Card> getSelected()
-    {
+    public List<Card> getSelected() {
         List<Card> selectedCards = new ArrayList<Card>();
-        synchronized (cardPositions)
-        {
+        synchronized (cardPositions) {
             for (Card card : cardPositions.keySet())
                 if (cardPositions.get(card).selected())
                     selectedCards.add(card);
@@ -89,49 +80,40 @@ public class GamePanel extends JPanel
         return selectedCards;
     }
 
-    public void resetSelected()
-    {
-        synchronized (cardPositions)
-        {
+    public void resetSelected() {
+        synchronized (cardPositions) {
             for (Card card : cardPositions.keySet())
                 cardPositions.get(card).setSelected(false);
         }
         repaint();
     }
 
-    public void moveCardsToDeck()
-    {
+    public void moveCardsToDeck() {
         cardPositions.clear();
     }
 
-    public void moveCardToHand(Card card, int playerID)
-    {
+    public void moveCardToHand(Card card, int playerID) {
         double angle = -getAngle(playerID);
         moveCard(card, handLocation(playerID, card), !view.joinedGame()
                 || playerID == view.getPlayerID(), 0.5, angle);
     }
 
-    public void moveCardToTable(Card card, int playerID)
-    {
+    public void moveCardToTable(Card card, int playerID) {
         moveCard(card, tableLocation(playerID, card), true, 0.3);
     }
 
-    public void moveCardAway(Card card, int playerID)
-    {
+    public void moveCardAway(Card card, int playerID) {
         moveCard(card, awayLocation(playerID), true, 0.2);
     }
 
-    public void showPreviousTrick(boolean flag)
-    {
+    public void showPreviousTrick(boolean flag) {
         showPreviousTrick = flag;
     }
 
-    public void paintComponent(Graphics g)
-    {
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        synchronized (view)
-        {
+        synchronized (view) {
             if (game == null)
                 return;
 
@@ -155,16 +137,13 @@ public class GamePanel extends JPanel
     }
 
     private void moveCard(Card card, Point point, boolean faceUp,
-            double snapRatio)
-    {
+                          double snapRatio) {
         moveCard(card, point, faceUp, snapRatio, 0);
     }
 
     private void moveCard(Card card, Point point, boolean faceUp,
-            double snapRatio, double dir)
-    {
-        synchronized (cardPositions)
-        {
+                          double snapRatio, double dir) {
+        synchronized (cardPositions) {
             if (!cardPositions.containsKey(card))
                 cardPositions
                         .put(card, new CardPosition(deckLocation(), false));
@@ -172,8 +151,7 @@ public class GamePanel extends JPanel
         }
     }
 
-    private void drawGameInformation(Graphics g)
-    {
+    private void drawGameInformation(Graphics g) {
         Font font = new Font("Times New Roman", 0, 14);
         g.setFont(font);
         g.setColor(Color.BLACK);
@@ -184,15 +162,14 @@ public class GamePanel extends JPanel
         int y = 0;
         g.drawString("Trump value: " + game.getTrumpValue(), 10, y += lineDiff);
         g.drawString("Trump suit: "
-                + (game.getTrumpSuit() == Card.SUIT.TRUMP ? '\u2668'
+                        + (game.getTrumpSuit() == Card.SUIT.TRUMP ? '\u2668'
                         : (char) (game.getTrumpSuit().ordinal() + '\u2660')),
                 10, y += lineDiff);
         g.drawString("Starter: " + game.getMaster().name, 10, y += lineDiff);
 
         /* Draw player names */
         List<Player> players = game.getPlayers();
-        for (Player player : players)
-        {
+        for (Player player : players) {
             double angle = getAngle(player.ID);
             int startX = (int) (450 * (1 + 0.9 * Math.sin(angle)));
             int startY = (int) (350 * (1 + 0.9 * Math.cos(angle)));
@@ -212,8 +189,7 @@ public class GamePanel extends JPanel
         }
     }
 
-    private void drawGameScores(Graphics g)
-    {
+    private void drawGameScores(Graphics g) {
         g.setFont(new Font("Times New Roman", 0, 14));
         g.setColor(Color.BLACK);
         FontMetrics fm = g.getFontMetrics();
@@ -223,16 +199,14 @@ public class GamePanel extends JPanel
         String s = "Scores";
         g.drawString(s, 890 - fm.stringWidth(s), y += lineDiff);
         Map<Integer, Integer> playerScores = game.getPlayerScores();
-        for (int playerID : playerScores.keySet())
-        {
+        for (int playerID : playerScores.keySet()) {
             s = game.getPlayerWithID(playerID).name + ": "
                     + Card.VALUE.values()[playerScores.get(playerID)];
             g.drawString(s, 890 - fm.stringWidth(s), y += lineDiff);
         }
     }
 
-    private void drawRoundScores(Graphics g)
-    {
+    private void drawRoundScores(Graphics g) {
         g.setFont(new Font("Times New Roman", 0, 14));
         g.setColor(Color.BLUE);
         FontMetrics fm = g.getFontMetrics();
@@ -240,15 +214,13 @@ public class GamePanel extends JPanel
 
         Map<String, Integer> teamScores = game.getTeamScores();
         int y = 640 - lineDiff * teamScores.size();
-        for (String teamName : teamScores.keySet())
-        {
+        for (String teamName : teamScores.keySet()) {
             String s = teamName + ": " + teamScores.get(teamName);
             g.drawString(s, 10, y += lineDiff);
         }
     }
 
-    private void drawSpecialInformation(Graphics g)
-    {
+    private void drawSpecialInformation(Graphics g) {
         g.setFont(new Font("Times New Roman", 0, 14));
         g.setColor(Color.BLACK);
         FontMetrics fm = g.getFontMetrics();
@@ -260,15 +232,13 @@ public class GamePanel extends JPanel
                 * (1 + (properties.find_a_friend ? 1 : 0) + friendCards.size());
         String s = properties.numDecks + " decks";
         g.drawString(s, 890 - fm.stringWidth(s), y += lineDiff);
-        if (properties.find_a_friend)
-        {
+        if (properties.find_a_friend) {
             s = "Find a friend!"
                     + (friendCards.isEmpty() ? "" : " Looking for:");
             g.drawString(s, 890 - fm.stringWidth(s), y += lineDiff);
         }
         Map<Card, Integer> friendCardsMap = friendCards.getFriendCards();
-        for (Card card : friendCardsMap.keySet())
-        {
+        for (Card card : friendCardsMap.keySet()) {
             int index = friendCardsMap.get(card);
             String indexStr;
             if (index == 1)
@@ -284,21 +254,19 @@ public class GamePanel extends JPanel
                     + " "
                     + card.value.toString().toLowerCase().replace("_", " ")
                     + (card.value == Card.VALUE.SMALL_JOKER
-                            || card.value == Card.VALUE.BIG_JOKER ? "" : " of "
-                            + card.suit.toString().toLowerCase() + "s");
+                    || card.value == Card.VALUE.BIG_JOKER ? "" : " of "
+                    + card.suit.toString().toLowerCase() + "s");
             g.drawString(s, 890 - fm.stringWidth(s), y += lineDiff);
         }
     }
 
-    private void drawDeck(Graphics g)
-    {
+    private void drawDeck(Graphics g) {
         BufferedImage image = cardImages.getCardBackImage();
         g.drawImage(image, 450 - image.getWidth() / 2,
                 350 - image.getHeight() / 2, null);
     }
 
-    private void drawShowPreviousTrickButton(Graphics g)
-    {
+    private void drawShowPreviousTrickButton(Graphics g) {
         // TODO make fancier button.
         g.setFont(new Font("Times New Roman", 0, 14));
         g.setColor(Color.BLACK);
@@ -307,41 +275,33 @@ public class GamePanel extends JPanel
         g.drawString(s, 450 - fm.stringWidth(s) / 2, 350 - fm.getHeight());
     }
 
-    private void drawCards(Graphics g)
-    {
-        synchronized (cardPositions)
-        {
+    private void drawCards(Graphics g) {
+        synchronized (cardPositions) {
             Set<Card> denotedCards = new HashSet<Card>();
-            for (Player player : game.getPlayers())
-            {
-                for (Card card : memoizeSortedHandCards(player.ID))
-                {
+            for (Player player : game.getPlayers()) {
+                for (Card card : memoizeSortedHandCards(player.ID)) {
                     moveCardToHand(card, player.ID);
                     denotedCards.add(card);
                 }
-                for (Card card : memoizeTableCards(player.ID))
-                {
+                for (Card card : memoizeTableCards(player.ID)) {
                     moveCardToTable(card, player.ID);
                     denotedCards.add(card);
                 }
             }
             Trick[] tricks =
-            { game.getCurrentTrick(), game.getPreviousTrick() };
+                    {game.getCurrentTrick(), game.getPreviousTrick()};
             for (Trick trick : tricks)
                 if (trick.getWinningPlay() != null)
                     for (Play play : trick.getPlays())
                         for (Card card : play.getCards())
-                            if (!denotedCards.contains(card))
-                            {
+                            if (!denotedCards.contains(card)) {
                                 moveCardAway(card, trick.getWinningPlay()
                                         .getPlayerID());
                                 denotedCards.add(card);
                             }
             List<Card> cardsToDraw = new ArrayList<Card>(denotedCards);
-            Collections.sort(cardsToDraw, new Comparator<Card>()
-            {
-                public int compare(Card card1, Card card2)
-                {
+            Collections.sort(cardsToDraw, new Comparator<Card>() {
+                public int compare(Card card1, Card card2) {
                     CardPosition position1 = cardPositions.get(card1);
                     CardPosition position2 = cardPositions.get(card2);
                     if (position1.faceUp() != position2.faceUp())
@@ -357,13 +317,11 @@ public class GamePanel extends JPanel
         }
     }
 
-    private Point deckLocation()
-    {
+    private Point deckLocation() {
         return new Point(450, 350);
     }
 
-    private Point handLocation(int playerID, Card card)
-    {
+    private Point handLocation(int playerID, Card card) {
         double angle = getAngle(playerID);
         int startX = (int) (450 * (1 + 0.7 * Math.sin(angle)));
         int startY = (int) (350 * (1 + 0.7 * Math.cos(angle)));
@@ -377,8 +335,7 @@ public class GamePanel extends JPanel
                 * Math.sin(angle) * (cardIndex - cards.size() / 2.0)));
     }
 
-    private Point tableLocation(int playerID, Card card)
-    {
+    private Point tableLocation(int playerID, Card card) {
         double angle = getAngle(playerID);
         int startX = (int) (450 * (1 + 0.4 * Math.sin(angle)));
         int startY = (int) (350 * (1 + 0.4 * Math.cos(angle)));
@@ -390,16 +347,14 @@ public class GamePanel extends JPanel
                 * Math.sin(angle) * (cardIndex - cards.size() / 2.0)));
     }
 
-    private Point awayLocation(int playerID)
-    {
+    private Point awayLocation(int playerID) {
         double angle = getAngle(playerID);
         int startX = (int) (450 * (1 + 2 * Math.sin(angle)));
         int startY = (int) (350 * (1 + 2 * Math.cos(angle)));
         return new Point(startX, startY);
     }
 
-    private double getAngle(int playerID)
-    {
+    private double getAngle(int playerID) {
         List<Player> players = game.getPlayers();
         int index = players.indexOf(game.getPlayerWithID(playerID));
         if (view.joinedGame())
@@ -407,8 +362,7 @@ public class GamePanel extends JPanel
         return 2 * Math.PI / players.size() * index;
     }
 
-    private void drawCard(Card card, Graphics g)
-    {
+    private void drawCard(Card card, Graphics g) {
         CardPosition position = cardPositions.get(card);
         BufferedImage image;
         if (!position.faceUp())
@@ -431,14 +385,12 @@ public class GamePanel extends JPanel
     private Map<Integer, List<Card>> sortedHandCards = new HashMap<Integer, List<Card>>();
     private Map<Integer, List<Card>> prevHandCards = new HashMap<Integer, List<Card>>();
 
-    private List<Card> memoizeSortedHandCards(int playerID)
-    {
+    private List<Card> memoizeSortedHandCards(int playerID) {
         if (game.getHand(playerID) == null)
             return Collections.emptyList();
 
         List<Card> cards = game.getHand(playerID).getCards();
-        if (!cards.equals(prevHandCards.get(playerID)))
-        {
+        if (!cards.equals(prevHandCards.get(playerID))) {
             List<Card> sortedCards = new ArrayList<Card>(cards);
             game.sortCards(sortedCards);
             sortedHandCards.put(playerID, sortedCards);
@@ -450,24 +402,20 @@ public class GamePanel extends JPanel
     private Map<Integer, List<Card>> tableCards = new HashMap<Integer, List<Card>>();
     private Map<Integer, List<Card>> prevTableCards = new HashMap<Integer, List<Card>>();
 
-    private List<Card> memoizeTableCards(int playerID)
-    {
+    private List<Card> memoizeTableCards(int playerID) {
         List<Card> cards = Collections.emptyList();
-        if (game.getState() == Game.State.AWAITING_PLAY)
-        {
+        if (game.getState() == Game.State.AWAITING_PLAY) {
             Play play = (showPreviousTrick ? game.getPreviousTrick() : game
                     .getCurrentTrick()).getPlayByID(playerID);
             if (play != null)
                 cards = play.getCards();
-        }
-        else if (game.getState() == Game.State.AWAITING_RESTART
+        } else if (game.getState() == Game.State.AWAITING_RESTART
                 && game.getKitty().getPlayerID() == playerID)
             cards = game.getKitty().getCards();
         else if (game.getShownCards() != null
                 && game.getShownCards().getPlayerID() == playerID)
             cards = game.getShownCards().getCards();
-        if (!cards.equals(prevTableCards.get(playerID)))
-        {
+        if (!cards.equals(prevTableCards.get(playerID))) {
             List<Card> sortedCards = new ArrayList<Card>(cards);
             game.sortCards(sortedCards);
 
@@ -477,25 +425,21 @@ public class GamePanel extends JPanel
         return tableCards.get(playerID);
     }
 
-    private class CardSelectListener extends MouseAdapter
-    {
+    private class CardSelectListener extends MouseAdapter {
         @Override
-        public void mouseClicked(MouseEvent e)
-        {
+        public void mouseClicked(MouseEvent e) {
             if (!view.joinedGame())
                 return;
 
             List<Card> cards = new ArrayList<Card>(
                     memoizeSortedHandCards(view.getPlayerID()));
             Collections.reverse(cards);
-            for (Card card : cards)
-            {
+            for (Card card : cards) {
                 CardPosition position = cardPositions.get(card);
                 if (e.getX() >= position.currX() - 35
                         && e.getX() < position.currX() + 35
                         && e.getY() >= position.currY() - 48
-                        && e.getY() < position.currY() + 48)
-                {
+                        && e.getY() < position.currY() + 48) {
                     position.setSelected(!position.selected());
                     break;
                 }
@@ -504,19 +448,16 @@ public class GamePanel extends JPanel
         }
     }
 
-    private class ShowPreviousTrickListener extends MouseAdapter
-    {
+    private class ShowPreviousTrickListener extends MouseAdapter {
         @Override
-        public void mousePressed(MouseEvent e)
-        {
+        public void mousePressed(MouseEvent e) {
             if (Math.hypot(450 - e.getX(), 350 - e.getY()) < 50)
                 showPreviousTrick = true;
             repaint();
         }
 
         @Override
-        public void mouseReleased(MouseEvent e)
-        {
+        public void mouseReleased(MouseEvent e) {
             showPreviousTrick = false;
             repaint();
         }

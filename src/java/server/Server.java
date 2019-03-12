@@ -21,8 +21,7 @@ import model.Player;
 import view.NullView;
 import view.View;
 
-public class Server
-{
+public class Server {
     private ServerSocket serverSocket;
     private List<Socket> sockets;
 
@@ -31,8 +30,7 @@ public class Server
     private Map<Integer, ObjectOutputStream> outs;
 
     /* Requests of players */
-    private enum Request
-    {
+    private enum Request {
         NONE, AWAITING_NEW_ROUND
     }
 
@@ -42,8 +40,7 @@ public class Server
     private Game game;
     private Timer drawingCardsTimer;
 
-    public Server(View view)
-    {
+    public Server(View view) {
         currentPlayerID = 101;
         players = new ArrayList<Player>();
         outs = new HashMap<Integer, ObjectOutputStream>();
@@ -51,31 +48,22 @@ public class Server
         this.view = view;
     }
 
-    public void startServer(int port) throws IOException
-    {
+    public void startServer(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         sockets = new ArrayList<Socket>();
 
-        new Thread()
-        {
-            public void run()
-            {
-                try
-                {
-                    while (true)
-                    {
+        new Thread() {
+            public void run() {
+                try {
+                    while (true) {
                         final Socket incoming = serverSocket.accept();
                         sockets.add(incoming);
 
                         new ListenerThread(incoming).start();
                     }
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
-                }
-                finally
-                {
+                } finally {
                     close();
                 }
             }
@@ -84,46 +72,33 @@ public class Server
         view.createRoom();
     }
 
-    private class ListenerThread extends Thread
-    {
+    private class ListenerThread extends Thread {
         private Socket incoming;
         private ObjectInputStream in;
         private Player player;
 
-        ListenerThread(Socket incoming)
-        {
+        ListenerThread(Socket incoming) {
             this.incoming = incoming;
         }
 
-        public void run()
-        {
-            try
-            {
+        public void run() {
+            try {
                 initialize();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 System.out.println("Invalid client tried to connect.");
                 return;
             }
-            while (true)
-            {
-                try
-                {
+            while (true) {
+                try {
                     processMessage(player, (Object[]) in.readObject());
-                }
-                catch (EOFException e)
-                {
+                } catch (EOFException e) {
                     System.out.println("Client " + player + " left.");
                     break;
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            synchronized (Server.this)
-            {
+            synchronized (Server.this) {
                 players.remove(player);
                 outs.remove(player);
                 if (game != null)
@@ -132,22 +107,17 @@ public class Server
             }
         }
 
-        void initialize() throws IOException
-        {
-            synchronized (Server.this)
-            {
+        void initialize() throws IOException {
+            synchronized (Server.this) {
                 ObjectOutputStream out = new ObjectOutputStream(
                         incoming.getOutputStream());
                 in = new ObjectInputStream(incoming.getInputStream());
 
                 /* HELLO [name] */
                 Object[] playerInfo;
-                try
-                {
+                try {
                     playerInfo = (Object[]) in.readObject();
-                }
-                catch (ClassNotFoundException e)
-                {
+                } catch (ClassNotFoundException e) {
                     // Client is using invalid message encoding.
                     throw new IOException();
                 }
@@ -168,31 +138,25 @@ public class Server
         }
     }
 
-    public void close()
-    {
-        try
-        {
+    public void close() {
+        try {
             serverSocket.close();
             for (Socket socket : sockets)
                 socket.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         view.closeRoom();
     }
 
-    protected synchronized void processMessage(Player player, Object... data)
-    {
+    protected synchronized void processMessage(Player player, Object... data) {
         // Reset request.
         requests.put(player.ID, Request.NONE);
 
         String command = (String) data[0];
 
-        if (command.equals("STARTGAME"))
-        {
+        if (command.equals("STARTGAME")) {
             /* STARTGAME [properties] */
             if (drawingCardsTimer != null)
                 drawingCardsTimer.cancel();
@@ -201,19 +165,13 @@ public class Server
             game.addPlayers(players);
             announce(data);
             // TODO ask other players to verify?
-        }
-        else if (command.equals("STARTROUND"))
-        {
+        } else if (command.equals("STARTROUND")) {
             /* STARTROUND */
-            if (game == null)
-            {
+            if (game == null) {
                 message(player, "NOTIFICATION", "Select 'New Game' first.");
-            }
-            else
-            {
+            } else {
                 boolean startNewRound = true;
-                if (!game.canStartNewRound())
-                {
+                if (!game.canStartNewRound()) {
                     requests.put(player.ID, Request.AWAITING_NEW_ROUND);
 
                     // See if all players want to start a new round
@@ -221,8 +179,7 @@ public class Server
                         if (requests.get(otherPlayer.ID) != Request.AWAITING_NEW_ROUND)
                             startNewRound = false;
                 }
-                if (startNewRound)
-                {
+                if (startNewRound) {
                     if (drawingCardsTimer != null)
                         drawingCardsTimer.cancel();
 
@@ -237,21 +194,17 @@ public class Server
 
                     /* Start drawing */
                     drawingCardsTimer = new Timer();
-                    drawingCardsTimer.schedule(new TimerTask()
-                    {
+                    drawingCardsTimer.schedule(new TimerTask() {
                         int waitSteps = 0;
 
-                        public void run()
-                        {
+                        public void run() {
                             int currentPlayerID = game.getCurrentPlayer().ID;
                             if (game.started()
-                                    && game.canDrawFromDeck(currentPlayerID))
-                            {
+                                    && game.canDrawFromDeck(currentPlayerID)) {
                                 game.drawFromDeck(currentPlayerID);
                                 announce("DRAW", currentPlayerID);
-                            }
-                            else if (waitSteps++ > 80) // wait for 8s for a
-                                                       // show.
+                            } else if (waitSteps++ > 80) // wait for 8s for a
+                            // show.
                             {
                                 game.takeKittyCards();
                                 announce("TAKEKITTY");
@@ -261,48 +214,33 @@ public class Server
                     }, 1000, 100);
                 }
             }
-        }
-        else if (command.equals("SELECTFRIEND"))
-        {
+        } else if (command.equals("SELECTFRIEND")) {
             /* SELECTFRIEND [player ID] [friend cards] */
             if (game.canSelectFriendCards((Integer) data[1],
-                    (FriendCards) data[2]))
-            {
+                    (FriendCards) data[2])) {
                 game.selectFriendCards((Integer) data[1], (FriendCards) data[2]);
                 announce(data);
             }
-        }
-        else
-        {
+        } else {
             Play play = (Play) data[1];
-            if (command.equals("SHOW"))
-            {
+            if (command.equals("SHOW")) {
                 /* SHOW [cards] */
-                if (game.canShowCards(play))
-                {
+                if (game.canShowCards(play)) {
                     game.showCards(play);
                     announce(data);
                 }
-            }
-            else if (command.equals("MAKEKITTY"))
-            {
+            } else if (command.equals("MAKEKITTY")) {
                 /* MAKEKITTY [cards] */
-                if (game.canMakeKitty(play))
-                {
+                if (game.canMakeKitty(play)) {
                     game.makeKitty(play);
                     announce(data);
                 }
-            }
-            else if (command.equals("PLAY"))
-            {
+            } else if (command.equals("PLAY")) {
                 /* PLAY [cards] */
-                if (game.canPlay(play))
-                {
-                    if (game.isSpecialPlay(play))
-                    {
+                if (game.canPlay(play)) {
+                    if (game.isSpecialPlay(play)) {
                         Play filteredPlay = game.filterSpecialPlay(play);
-                        if (filteredPlay != play)
-                        {
+                        if (filteredPlay != play) {
                             message(player, "NOTIFICATION",
                                     "Invalid special play.");
                             play = filteredPlay;
@@ -315,20 +253,15 @@ public class Server
         }
     }
 
-    private void message(Player player, Object... args)
-    {
-        try
-        {
+    private void message(Player player, Object... args) {
+        try {
             outs.get(player.ID).writeObject(args);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void announce(Object... args)
-    {
+    private void announce(Object... args) {
         for (Player player : players)
             message(player, args);
     }

@@ -7,10 +7,8 @@ import java.net.URL;
 import server.Server;
 import view.NullView;
 
-public class ServerMain
-{
-    public static void main(String... args) throws Exception
-    {
+public class ServerMain {
+    public static void main(String... args) throws Exception {
         /* Find external IP */
         String IP = new BufferedReader(new InputStreamReader(new URL(
                 "http://icanhazip.com/").openStream())).readLine();

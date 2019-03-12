@@ -17,8 +17,7 @@ import model.Play;
 import model.Player;
 import view.View;
 
-public class Client
-{
+public class Client {
     private Socket socket;
     private List<Player> players;
     private ObjectOutputStream out;
@@ -26,49 +25,38 @@ public class Client
     private View view;
     private Game game;
 
-    public Client(View view)
-    {
+    public Client(View view) {
         this.players = new ArrayList<Player>();
         this.view = view;
     }
 
     /**
      * Connects to the server at the specified port and address.
-     * 
+     *
      * @throws IOException
      */
-    public void connect(int port, byte[] address) throws IOException
-    {
+    public void connect(int port, byte[] address) throws IOException {
         socket = new Socket();
         socket.connect(new InetSocketAddress(InetAddress.getByAddress(address),
                 port), 30000);
 
-        new Thread()
-        {
-            public void run()
-            {
-                try
-                {
+        new Thread() {
+            public void run() {
+                try {
                     out = new ObjectOutputStream(socket.getOutputStream());
                     ObjectInputStream in = new ObjectInputStream(
                             socket.getInputStream());
                     request("HELLO", view.name);
 
-                    while (true)
-                    {
+                    while (true) {
                         Object obj = in.readObject();
-                        synchronized (view)
-                        {
+                        synchronized (view) {
                             processMessage((Object[]) obj);
                         }
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
-                }
-                finally
-                {
+                } finally {
                     close();
                 }
             }
@@ -77,43 +65,35 @@ public class Client
         view.joinRoom();
     }
 
-    public void close()
-    {
-        try
-        {
+    public void close() {
+        try {
             players.clear();
             if (socket != null)
                 socket.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         view.leaveRoom();
     }
 
-    public int numPlayers()
-    {
+    public int numPlayers() {
         return players.size();
     }
 
     /* Methods called by controller */
 
-    public synchronized void requestStartGame(GameProperties properties)
-    {
+    public synchronized void requestStartGame(GameProperties properties) {
         request("STARTGAME", properties);
         view.requestStartGame();
     }
 
-    public synchronized void requestStartRound()
-    {
+    public synchronized void requestStartRound() {
         request("STARTROUND");
         view.requestStartRound();
     }
 
-    public synchronized void requestShowCards(List<Card> cards)
-    {
+    public synchronized void requestShowCards(List<Card> cards) {
         Play play = new Play(view.getPlayerID(), cards);
         if (game.canShowCards(play))
             request("SHOW", play);
@@ -121,14 +101,12 @@ public class Client
             view.notify("Invalid show.");
     }
 
-    public synchronized void requestFriendCards(FriendCards friendCards)
-    {
+    public synchronized void requestFriendCards(FriendCards friendCards) {
         if (game.canSelectFriendCards(view.getPlayerID(), friendCards))
             request("SELECTFRIEND", view.getPlayerID(), friendCards);
     }
 
-    public synchronized void requestMakeKitty(List<Card> cards)
-    {
+    public synchronized void requestMakeKitty(List<Card> cards) {
         Play play = new Play(view.getPlayerID(), cards);
         if (game.canMakeKitty(play))
             request("MAKEKITTY", play);
@@ -136,8 +114,7 @@ public class Client
             view.notify("Incorrect number of cards.");
     }
 
-    public synchronized void requestPlayCards(List<Card> cards)
-    {
+    public synchronized void requestPlayCards(List<Card> cards) {
         Play play = new Play(view.getPlayerID(), cards);
         if (game.canPlay(play))
             request("PLAY", play);
@@ -145,37 +122,27 @@ public class Client
             view.notify("Invalid play.");
     }
 
-    private synchronized void request(Object... args)
-    {
-        try
-        {
+    private synchronized void request(Object... args) {
+        try {
             out.writeObject(args);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /* Called after a response from the server */
 
-    private synchronized void processMessage(Object... data)
-    {
+    private synchronized void processMessage(Object... data) {
         String command = (String) data[0];
 
-        if (command.equals("ADDPLAYER"))
-        {
+        if (command.equals("ADDPLAYER")) {
             /* ADDPLAYER [player] */
             Player player = (Player) data[1];
             players.add(player);
-        }
-        else if (command.equals("YOU"))
-        {
+        } else if (command.equals("YOU")) {
             /* YOU [playerID] */
             view.setPlayerID((Integer) data[1]);
-        }
-        else if (command.equals("REMOVEPLAYER"))
-        {
+        } else if (command.equals("REMOVEPLAYER")) {
             /* REMOVEPLAYER [playerID] */
             Player removedPlayer = null;
             for (Player player : players)
@@ -183,58 +150,37 @@ public class Client
                     break;
             if (game != null)
                 game.removePlayer(removedPlayer);
-        }
-        else if (command.equals("STARTGAME"))
-        {
+        } else if (command.equals("STARTGAME")) {
             /* STARTGAME [properties] */
             game = new Game((GameProperties) data[1]);
             game.setView(view);
             game.addPlayers(players);
-        }
-        else if (command.equals("GAMESTATE"))
-        {
+        } else if (command.equals("GAMESTATE")) {
             /* GAMESTATE [game] */
             game = (Game) data[1];
             game.setView(view);
-        }
-        else if (command.equals("STARTROUND"))
-        {
+        } else if (command.equals("STARTROUND")) {
             /* STARTROUND [random seed] */
             game.startRound((Long) data[1]);
-        }
-        else if (command.equals("NOTIFICATION"))
-        {
+        } else if (command.equals("NOTIFICATION")) {
             /* NOTIFICATION [message] */
             view.notify((String) data[1]);
-        }
-        else if (command.equals("DRAW"))
-        {
+        } else if (command.equals("DRAW")) {
             /* DRAW [player ID] */
             game.drawFromDeck((Integer) data[1]);
-        }
-
-        else if (command.equals("TAKEKITTY"))
-        {
+        } else if (command.equals("TAKEKITTY")) {
             /* TAKEKITTY */
             game.takeKittyCards();
-        }
-        else if (command.equals("SHOW"))
-        {
+        } else if (command.equals("SHOW")) {
             /* SHOW [cards] */
             game.showCards((Play) data[1]);
-        }
-        else if (command.equals("SELECTFRIEND"))
-        {
+        } else if (command.equals("SELECTFRIEND")) {
             /* SELECTFRIEND [player ID] [friend cards] */
             game.selectFriendCards((Integer) data[1], (FriendCards) data[2]);
-        }
-        else if (command.equals("MAKEKITTY"))
-        {
+        } else if (command.equals("MAKEKITTY")) {
             /* MAKEKITTY [cards] */
             game.makeKitty((Play) data[1]);
-        }
-        else if (command.equals("PLAY"))
-        {
+        } else if (command.equals("PLAY")) {
             /* PLAY [cards] */
             game.play((Play) data[1]);
         }

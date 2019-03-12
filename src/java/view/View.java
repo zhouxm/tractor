@@ -8,33 +8,28 @@ import model.Trick;
 import server.Server;
 import client.Client;
 
-public abstract class View
-{
+public abstract class View {
     public final String name;
     public final Server server;
     public final Client client;
 
     private int myPlayerID;
 
-    public View(String name)
-    {
+    public View(String name) {
         this.name = name;
         this.server = new Server(this);
         this.client = new Client(this);
     }
 
-    public boolean joinedGame()
-    {
+    public boolean joinedGame() {
         return myPlayerID != 0;
     }
 
-    public int getPlayerID()
-    {
+    public int getPlayerID() {
         return myPlayerID;
     }
 
-    public void setPlayerID(int ID)
-    {
+    public void setPlayerID(int ID) {
         myPlayerID = ID;
     }
 

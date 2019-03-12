@@ -21,8 +21,7 @@ import model.Card;
 import model.FriendCards;
 import client.Client;
 
-public class FriendCardsForm extends JFrame
-{
+public class FriendCardsForm extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private int numFriends;
@@ -35,8 +34,7 @@ public class FriendCardsForm extends JFrame
     private JButton OKButton;
 
     public FriendCardsForm(JFrame parent, final Client client, int numDecks,
-            final int numFriends)
-    {
+                           final int numFriends) {
         setTitle("Select who to be your friend.");
         setResizable(false);
 
@@ -69,22 +67,19 @@ public class FriendCardsForm extends JFrame
         for (int i = 0; i < suitOptions.length; i++)
             suitOptions[i] = cardSuits[i].toString().toLowerCase() + "s";
 
-        for (int i = 0; i < numFriends; i++)
-        {
+        for (int i = 0; i < numFriends; i++) {
             indexMenus.add(new JComboBox<String>(indexOptions));
             valueMenus.add(new JComboBox<String>(valueOptions));
             suitMenus.add(new JComboBox<String>(suitOptions));
 
             final int iCopy = i;
             valueMenus.get(i).setSelectedItem("ace");
-            valueMenus.get(i).addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
+            valueMenus.get(i).addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
                     if (valueMenus.get(iCopy).getSelectedItem()
                             .equals("small joker")
                             || valueMenus.get(iCopy).getSelectedItem()
-                                    .equals("big joker"))
+                            .equals("big joker"))
                         suitMenus.get(iCopy).setEnabled(false);
                     else
                         suitMenus.get(iCopy).setEnabled(true);
@@ -93,20 +88,17 @@ public class FriendCardsForm extends JFrame
         }
 
         OKButton = new JButton("OK");
-        OKButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        OKButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 FriendCards friendCards = new FriendCards();
                 int ID = 1;
-                for (int i = 0; i < numFriends; i++)
-                {
+                for (int i = 0; i < numFriends; i++) {
                     Card.VALUE value = Card.VALUE.values()[valueMenus.get(i)
                             .getSelectedIndex()];
                     Card.SUIT suit = (value == Card.VALUE.BIG_JOKER
                             || value == Card.VALUE.SMALL_JOKER ? Card.SUIT.TRUMP
                             : Card.SUIT.values()[suitMenus.get(i)
-                                    .getSelectedIndex()]);
+                            .getSelectedIndex()]);
                     int index = indexMenus.get(i).getSelectedIndex() + 1;
                     friendCards.addFriendCard(new Card(value, suit, ID++),
                             index);
@@ -129,8 +121,7 @@ public class FriendCardsForm extends JFrame
                 position.y + (parentSize.height - size.height) / 2);
     }
 
-    private void arrange()
-    {
+    private void arrange() {
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         GroupLayout layout = new GroupLayout(panel);
@@ -138,16 +129,14 @@ public class FriendCardsForm extends JFrame
 
         JLabel[] introLabels = new JLabel[numFriends];
         JLabel[] ofLabels = new JLabel[numFriends];
-        for (int i = 0; i < numFriends; i++)
-        {
+        for (int i = 0; i < numFriends; i++) {
             introLabels[i] = new JLabel("Card " + (i + 1) + ":");
             ofLabels[i] = new JLabel("of");
         }
 
         Group[] sequentialGroups = new Group[numFriends];
         Group[] parallelGroups = new Group[numFriends];
-        for (int i = 0; i < numFriends; i++)
-        {
+        for (int i = 0; i < numFriends; i++) {
             sequentialGroups[i] = layout.createSequentialGroup()
                     .addComponent(introLabels[i])
                     .addComponent(indexMenus.get(i))

@@ -26,8 +26,7 @@ import model.Game;
 import model.Play;
 import model.Trick;
 
-public class HumanView extends View
-{
+public class HumanView extends View {
     private boolean test; // flag for testing
 
     private Game game;
@@ -42,8 +41,7 @@ public class HumanView extends View
 
     private JButton actionButton;
 
-    public HumanView(String name, boolean testing)
-    {
+    public HumanView(String name, boolean testing) {
         super(name);
 
         this.test = testing;
@@ -55,37 +53,27 @@ public class HumanView extends View
         notificationField.setEditable(false);
 
         createRoomButton = new JButton("Create Room");
-        createRoomButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                try
-                {
+        createRoomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
                     server.startServer(3003);
-                }
-                catch (IOException e2)
-                {
+                } catch (IOException e2) {
                     JOptionPane.showMessageDialog(frame, e2.getMessage());
                 }
             }
         });
         closeRoomButton = new JButton("Close Room");
-        closeRoomButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        closeRoomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 if (JOptionPane.showConfirmDialog(frame,
-                        "Are you sure you want to close the room?") == JOptionPane.YES_OPTION)
-                {
+                        "Are you sure you want to close the room?") == JOptionPane.YES_OPTION) {
                     server.close();
                 }
             }
         });
         joinRoomButton = new JButton("Join Room");
-        joinRoomButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        joinRoomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 String input = "127.0.0.1";
                 if (!test)
                     input = JOptionPane
@@ -93,8 +81,7 @@ public class HumanView extends View
                 if (input == null)
                     return;
 
-                try
-                {
+                try {
                     /* Try to parse input IP */
                     String[] addressStr = input.split("\\.");
                     byte[] address = new byte[4];
@@ -103,61 +90,48 @@ public class HumanView extends View
 
                     /* Connect to server */
                     client.connect(3003, address);
-                }
-                catch (Exception e2)
-                {
+                } catch (Exception e2) {
                     JOptionPane.showMessageDialog(frame, e2.getMessage());
                 }
             }
         });
         leaveRoomButton = new JButton("Leave Room");
-        leaveRoomButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        leaveRoomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 if (JOptionPane.showConfirmDialog(frame,
-                        "Are you sure you want to leave the room?") == JOptionPane.YES_OPTION)
-                {
+                        "Are you sure you want to leave the room?") == JOptionPane.YES_OPTION) {
                     client.close();
                 }
             }
         });
         newGameButton = new JButton("New Game");
-        newGameButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        newGameButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 new GamePropertiesForm(frame, client).setVisible(true);
             }
         });
         newRoundButton = new JButton("New Round");
-        newRoundButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        newRoundButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 client.requestStartRound();
             }
         });
         buttons = new JButton[]
-        { createRoomButton, closeRoomButton, joinRoomButton, leaveRoomButton,
-                newGameButton, newRoundButton };
+                {createRoomButton, closeRoomButton, joinRoomButton, leaveRoomButton,
+                        newGameButton, newRoundButton};
         for (JButton button : buttons)
             button.setVisible(false);
         createRoomButton.setVisible(true);
         joinRoomButton.setVisible(true);
 
         actionButton = new JButton();
-        actionButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                if (game != null && game.started())
-                {
+        actionButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (game != null && game.started()) {
                     List<Card> cards = gamePanel.getSelected();
                     if (cards.isEmpty())
                         return;
-                    switch (game.getState())
-                    {
+                    switch (game.getState()) {
                         case AWAITING_SHOW:
                             client.requestShowCards(cards);
                             break;
@@ -165,14 +139,12 @@ public class HumanView extends View
                             client.requestShowCards(cards);
                             break;
                         case AWAITING_KITTY:
-                            if (getPlayerID() == game.getMaster().ID)
-                            {
+                            if (getPlayerID() == game.getMaster().ID) {
                                 client.requestMakeKitty(cards);
                                 break;
                             }
                         case AWAITING_PLAY:
-                            if (getPlayerID() == game.getCurrentPlayer().ID)
-                            {
+                            if (getPlayerID() == game.getCurrentPlayer().ID) {
                                 // If special play, ask player for confirmation.
                                 if (game.isSpecialPlay(new Play(getPlayerID(),
                                         cards)))
@@ -200,16 +172,14 @@ public class HumanView extends View
         arrange();
     }
 
-    private void arrange()
-    {
+    private void arrange() {
         GroupLayout layout = new GroupLayout(frame.getContentPane());
 
         Group sequentialGroup = layout.createSequentialGroup();
         Group parallelGroup = layout.createParallelGroup(Alignment.BASELINE);
         sequentialGroup.addComponent(notificationField);
         parallelGroup.addComponent(notificationField);
-        for (JButton button : buttons)
-        {
+        for (JButton button : buttons) {
             sequentialGroup.addComponent(button);
             parallelGroup.addComponent(button);
         }
@@ -223,14 +193,10 @@ public class HumanView extends View
         frame.getContentPane().setLayout(layout);
     }
 
-    public void start()
-    {
-        try
-        {
+    public void start() {
+        try {
             gamePanel.loadImages();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             JOptionPane.showMessageDialog(frame,
                     "Error: could not load card images.");
         }
@@ -239,14 +205,10 @@ public class HumanView extends View
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void createRoom()
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                try
-                {
+    public void createRoom() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
                     notificationField.setText("Setting up server...");
 
                     /* Find external IP */
@@ -260,21 +222,16 @@ public class HumanView extends View
                     createRoomButton.setVisible(false);
                     closeRoomButton.setVisible(true);
                     frame.repaint();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     JOptionPane.showMessageDialog(frame, e.getMessage());
                 }
             }
         });
     }
 
-    public void closeRoom()
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+    public void closeRoom() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 closeRoomButton.setVisible(false);
                 createRoomButton.setVisible(true);
                 frame.repaint();
@@ -282,12 +239,9 @@ public class HumanView extends View
         });
     }
 
-    public void joinRoom()
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+    public void joinRoom() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 notificationField.setText("Joined room.");
                 joinRoomButton.setVisible(false);
                 leaveRoomButton.setVisible(true);
@@ -298,12 +252,9 @@ public class HumanView extends View
         });
     }
 
-    public void leaveRoom()
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+    public void leaveRoom() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 notificationField.setText("Left room.");
                 leaveRoomButton.setVisible(false);
                 joinRoomButton.setVisible(true);
@@ -314,18 +265,14 @@ public class HumanView extends View
         });
     }
 
-    public void requestStartGame()
-    {
+    public void requestStartGame() {
         notificationField.setText("Sending new game request...");
         frame.repaint();
     }
 
-    public void startGame(final Game game)
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+    public void startGame(final Game game) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 notificationField
                         .setText("New game started. Click 'New Round' to begin.");
                 actionButton.setVisible(false);
@@ -336,18 +283,14 @@ public class HumanView extends View
         });
     }
 
-    public void requestStartRound()
-    {
+    public void requestStartRound() {
         notificationField.setText("Waiting for other players...");
         frame.repaint();
     }
 
-    public void startRound()
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+    public void startRound() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 notificationField.setText("New round started.");
                 actionButton.setText("SHOW");
                 actionButton.setVisible(true);
@@ -357,12 +300,9 @@ public class HumanView extends View
         });
     }
 
-    public void requestFriendCards(final int numFriends)
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+    public void requestFriendCards(final int numFriends) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 if (getPlayerID() == game.getMaster().ID)
                     new FriendCardsForm(frame, client,
                             game.getProperties().numDecks, numFriends)
@@ -374,64 +314,51 @@ public class HumanView extends View
         });
     }
 
-    public void notifyCanMakeKitty(final int kittySize)
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                if (getPlayerID() == game.getMaster().ID)
-                {
+    public void notifyCanMakeKitty(final int kittySize) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (getPlayerID() == game.getMaster().ID) {
                     notificationField
                             .setText("Select " + kittySize + " cards.");
                     actionButton.setText("MAKE KITTY");
                     actionButton.setVisible(true);
-                }
-                else
+                } else
                     actionButton.setVisible(false);
             }
         });
     }
 
-    public void drawCard(Card card, int playerID)
-    {
+    public void drawCard(Card card, int playerID) {
         gamePanel.moveCardToHand(card, playerID);
         frame.repaint();
     }
 
-    public void showCards(Play play)
-    {
+    public void showCards(Play play) {
         for (Card card : play.getCards())
             gamePanel.moveCardToTable(card, play.getPlayerID());
         frame.repaint();
     }
 
-    public void selectFriendCards(FriendCards friendCards)
-    {
+    public void selectFriendCards(FriendCards friendCards) {
     }
 
-    public void makeKitty(Play play)
-    {
+    public void makeKitty(Play play) {
         for (Card card : play.getCards())
             gamePanel.moveCardAway(card, play.getPlayerID());
         beforeTurn();
     }
 
-    public void playCards(Play play)
-    {
+    public void playCards(Play play) {
         for (Card card : play.getCards())
             gamePanel.moveCardToTable(card, play.getPlayerID());
         beforeTurn();
     }
 
-    public void finishTrick(final Trick trick, final int winnerID)
-    {
+    public void finishTrick(final Trick trick, final int winnerID) {
         gamePanel.showPreviousTrick(true);
         /* Delay a while before drawing the trick finish. */
-        new Timer().schedule(new TimerTask()
-        {
-            public void run()
-            {
+        new Timer().schedule(new TimerTask() {
+            public void run() {
                 for (Play play : trick.getPlays())
                     for (Card card : play.getCards())
                         gamePanel.moveCardAway(card, winnerID);
@@ -440,49 +367,36 @@ public class HumanView extends View
         }, 2000);
     }
 
-    public void endRound()
-    {
+    public void endRound() {
         actionButton.setVisible(false);
         Play kitty = game.getKitty();
         for (Card card : kitty.getCards())
             gamePanel.moveCardToTable(card, kitty.getPlayerID());
     }
 
-    public void notify(final String notification)
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+    public void notify(final String notification) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 JOptionPane.showMessageDialog(null, notification);
             }
         });
     }
 
-    public void repaint()
-    {
+    public void repaint() {
         frame.repaint();
     }
 
-    private void beforeTurn()
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                if (game.canStartNewRound())
-                {
+    private void beforeTurn() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (game.canStartNewRound()) {
                     notificationField.setText("Click \"Start a New Round\".");
                     actionButton.setVisible(false);
-                }
-                else if (getPlayerID() == game.getCurrentPlayer().ID)
-                {
+                } else if (getPlayerID() == game.getCurrentPlayer().ID) {
                     notificationField.setText("Your turn.");
                     actionButton.setText("PLAY");
                     actionButton.setVisible(true);
-                }
-                else
-                {
+                } else {
                     notificationField.setText(game.getCurrentPlayer().name
                             + "'s turn.");
                     actionButton.setVisible(false);

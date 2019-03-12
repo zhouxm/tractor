@@ -2,8 +2,7 @@ package model;
 
 import java.io.Serializable;
 
-public class GameProperties implements Serializable
-{
+public class GameProperties implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /* Number of decks used; 54 cards each */
@@ -16,8 +15,7 @@ public class GameProperties implements Serializable
     public boolean find_a_friend = false;
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "GameProperties [numDecks=" + numDecks + ", find_a_friend="
                 + find_a_friend + "]";
     }
