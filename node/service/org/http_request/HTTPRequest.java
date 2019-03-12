@@ -9,40 +9,41 @@ import java.net.HttpURLConnection;
 
 public class HTTPRequest {
 
-    private HTTPRequest() {}
+    private HTTPRequest() {
+    }
 
     public static String executePost(String targetURL, String urlParameters) {
         URL url;
-        HttpURLConnection connection = null;  
+        HttpURLConnection connection = null;
         try {
             //Create connection
             url = new URL(targetURL);
-            connection = (HttpURLConnection)url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", 
+            connection.setRequestProperty("Content-Type",
                     "application/x-www-form-urlencoded");
 
-            connection.setRequestProperty("Content-Length", "" + 
+            connection.setRequestProperty("Content-Length", "" +
                     Integer.toString(urlParameters.getBytes().length));
-            connection.setRequestProperty("Content-Language", "en-US");  
+            connection.setRequestProperty("Content-Language", "en-US");
 
-            connection.setUseCaches (false);
+            connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
             //Send request
-            DataOutputStream wr = new DataOutputStream (
-                    connection.getOutputStream ());
-            wr.writeBytes (urlParameters);
-            wr.flush ();
-            wr.close ();
+            DataOutputStream wr = new DataOutputStream(
+                    connection.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
 
             //Get Response    
             InputStream is = connection.getInputStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
             String line;
-            StringBuffer response = new StringBuffer(); 
-            while((line = rd.readLine()) != null) {
+            StringBuffer response = new StringBuffer();
+            while ((line = rd.readLine()) != null) {
                 response.append(line);
                 response.append('\r');
             }
@@ -56,8 +57,8 @@ public class HTTPRequest {
 
         } finally {
 
-            if(connection != null) {
-                connection.disconnect(); 
+            if (connection != null) {
+                connection.disconnect();
             }
         }
     }

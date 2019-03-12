@@ -7,3 +7,9 @@ bin/
 *.swp
 *~
 /bin
+
+.idea
+*.iml
+.gradle
+
+node_modules
