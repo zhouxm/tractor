@@ -1,4 +1,4 @@
-package com.leoleo.tractor.model;
+package ai.tractor.model;
 
 import java.io.Serializable;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
-package com.leoleo.tractor.model;
+package ai.tractor.model;
 
-import com.leoleo.tractor.view.View;
+import ai.tractor.view.View;
 
 import java.io.Serializable;
 import java.util.*;

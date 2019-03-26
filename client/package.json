@@ -6,10 +6,10 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "bcrypt": "*",
     "ejs": "1.0.0",
     "express": "3.4.0",
-    "mysql2": "0.11.4",
-    "bcrypt": "*",
+    "mysql": "^2.16.0",
     "socket.io": "0.9.17"
   }
 }

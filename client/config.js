@@ -4,12 +4,13 @@ const config = {
     db: {
         host: 'localhost',
         port: 3306,
-        databases: 'demo',
+        databases: 'tractor',
         username: 'localhost',
         password: 'localhost',
     },
     app:{
-        masterKey:"tractor"
+        masterKey:"tractor",
+        port: 3000,
     }
 };
 

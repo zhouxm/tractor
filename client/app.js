@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-var config = require('./config').config;
+var config = require('./config');
 var express = require('express');
 var http = require('http');
 var model = require('./model').Model;
@@ -10,7 +10,7 @@ var routes = require('./routes');
 
 var app = express();
 
-app.set('port', config.port);
+app.set('port', config.app.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.logger('dev'));

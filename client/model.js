@@ -1,9 +1,16 @@
 var config = require('./config');
 var crypto = require('crypto');
-var mysql = require('mysql');
 var bcrypt = require('bcrypt');
 var url = 'mysql://' + config.db.host + ':3306/' + config.db.name + '?user=' + config.db.user + '&password=' + config.db.password;
-var pool = mysql.createPool(url);
+var mysql = require('mysql');
+var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'localhost',
+    password: 'localhost',
+    database: 'tractor'
+});
+
+connection.connect();
 
 function Model() {
     var c1 = function () {
@@ -38,15 +45,8 @@ function Model() {
 }
 
 function execute(query, args, callback) {
-    pool.getConnection(function (err, connection) {
-        if (err) {
-            callback(err);
-        } else {
-            connection.query(query, args, function (err, rows, fields) {
-                connection.release();
-                callback(err, rows, fields);
-            });
-        }
+    connection.query(query, args, function (err, rows, fields) {
+        callback(err, rows, fields);
     });
 }
 

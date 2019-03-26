@@ -1,6 +1,7 @@
-package com.leoleo.tractor.view;
+package ai.tractor.view;
 
 
+import ai.tractor.model.*;
 import com.leoleo.tractor.model.*;
 
 public class NullView extends View {

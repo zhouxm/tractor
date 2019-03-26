@@ -1,6 +1,6 @@
-package com.leoleo.tractor;
+package ai.tractor;
 
-import com.leoleo.tractor.model.Play;
+import ai.tractor.model.Play;
 import org.http_request.HTTPRequest;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;

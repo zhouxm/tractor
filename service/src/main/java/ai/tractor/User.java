@@ -1,4 +1,4 @@
-package com.leoleo.tractor;
+package ai.tractor;
 
 import org.java_websocket.WebSocket;
 
