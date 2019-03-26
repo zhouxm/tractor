@@ -9,9 +9,8 @@ bin/
 /bin
 
 .idea
+*.idea
 *.iml
 .gradle
 
-*/node_modules
-*/.idea
-build/
+node_modules
